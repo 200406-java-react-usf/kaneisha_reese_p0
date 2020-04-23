@@ -1,4 +1,4 @@
-import { Groomer } from '../models/groomers'
+import { Groomer } from '../models/groomer'
 
 let id = 1; 
 
