@@ -1,0 +1,16 @@
+// https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
+{
+    // https://www.typescriptlang.org/docs/handbook/compiler-options.html
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "commonJS",
+        "moduleResolution": "node",
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outDir": "./build",
+        "allowJs": true
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
