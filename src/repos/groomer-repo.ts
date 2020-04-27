@@ -1,10 +1,12 @@
 import data from '../data/groomers-db'
 import { Groomer } from '../models/groomer'
 import { CrudRepo } from './crud-repo'
-
+import Validator from '../util/validator';
 import { 
     BadRequestError, 
-    ResourceNotFoundError 
+    ResourceNotFoundError, 
+    ResourcePersistenceError,
+    NotImplementedError
 } from '../errors/errors';
 
 export class GroomerRepo implements CrudRepo<Groomer> {
@@ -18,10 +20,12 @@ export class GroomerRepo implements CrudRepo<Groomer> {
     }
 
     getAll(): Promise<Groomer[]> {
+        
         console.log(data);
-        return new Promise<Groomer[]>((resolve, reject) =>{
+        
+        return new Promise<Groomer[]>((resolve, reject) => {
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 let groomers: Groomer[] = [];
 
                 for(let groomer of data) {
@@ -29,20 +33,22 @@ export class GroomerRepo implements CrudRepo<Groomer> {
                 }
 
                 if (groomers.length == 0){
-                    reject('error');
+                    reject(new ResourceNotFoundError());
                     return;
                 }
 
                 resolve(groomers);
-            }, 250)
-        })
+
+            });
+        });
+
     }
 
     getById(id: number): Promise<Groomer> {
     
         return new Promise<Groomer>((resolve, reject) => {
     
-            if (typeof id !== 'number' || !Number.isInteger(id) || id <= 0) {
+            if (!Validator.isValidId(id)) {
                 reject(new BadRequestError());
                 return;
             }
@@ -65,19 +71,63 @@ export class GroomerRepo implements CrudRepo<Groomer> {
 
     save(newGroomer: Groomer): Promise<Groomer> {
         return new Promise((resolve, reject) => {
-            reject('Not implemented');
-        });
-    }
+            if (!Validator.isValidObject(newGroomer, 'id')) {
+                reject(new BadRequestError('Invalid property values found in provided user.'));
+                return;
+            }
+        
+            setTimeout(() => {
+        
+                
+        
+                newGroomer.id = (data.length) + 1;
+                data.push(newGroomer);
+        
+                resolve(newGroomer);
+        
+            });
 
-    update(updatedGroomer: Groomer): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            reject('Not implemented');
         });
+    
+    }
+    update(updatedGroomer: Groomer): Promise<boolean> {
+        
+        return new Promise<boolean>((resolve, reject) => {
+
+            if (!Validator.isValidObject(updatedGroomer)) {
+                reject(new BadRequestError('Invalid user provided (invalid values found).'));
+                return;
+            }
+        
+            setTimeout(() => {
+        
+                let persistedGroomer = data.find(user => user.id === updatedGroomer.id);
+        
+                if (!persistedGroomer) {
+                    reject(new ResourceNotFoundError('No user found with provided id.'));
+                    return;
+                }
+    
+                persistedGroomer = updatedGroomer;
+    
+                resolve(true);
+                return;
+        
+            });
+
+        });
+    
     }
 
     deleteById(id: number): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            reject('Not implemented');
-        })
+
+        return new Promise<boolean>((resolve, reject) => {
+            
+            if (!Validator.isValidId(id)) {
+                reject(new BadRequestError());
+            }
+
+            reject(new NotImplementedError());
+        });
     }
 }
