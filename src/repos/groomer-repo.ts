@@ -1,4 +1,3 @@
-import data from '../data/groomers-db'
 import { Groomer } from '../models/groomer'
 import { CrudRepo } from './crud-repo'
 import Validator from '../util/validator';
@@ -6,61 +5,53 @@ import {
     BadRequestError, 
     ResourceNotFoundError, 
     ResourcePersistenceError,
-    NotImplementedError
+    NotImplementedError,
+    InternalServerError
 } from '../errors/errors';
+import { PoolClient } from 'pg';
+import { connectionPool } from '..';
 
 export class GroomerRepo implements CrudRepo<Groomer> {
     
-    
-    private static instance: GroomerRepo;
-    private constructor() { }
+    baseQuery = `
+    select
+        au.id, 
+        au.username, 
+        au.password, 
+        au.first_name,
+        au.last_name,
+        au.email,
+        ur.name as role_name
+    from app_users au
+    join user_roles ur
+    on au.role_id = ur.id
+`;
 
-    static getInstance() {
-        return !GroomerRepo.instance ? GroomerRepo.instance = new GroomerRepo() : GroomerRepo.instance;
+async getAll(): Promise<Groomer[]> {
+
+    let client: PoolClient;
+
+    try {
+        client = await connectionPool.connect();
+        let sql = `${this.baseQuery}`;
+        let rs = await client.query(sql); // rs = ResultSet
+        return rs.rows.map(mapUserResultSet);
+    } catch (e) {
+        throw new InternalServerError();
+    } finally {
+        client && client.release();
     }
 
-    getAll(): Promise<Groomer[]> {
-        
-        console.log(data);
-        
-        return new Promise<Groomer[]>((resolve, reject) => {
-
-            setTimeout(() => {
-                let groomers: Groomer[] = [];
-
-                for(let groomer of data) {
-                    groomers.push({...groomer});
-                }
-
-                if (groomers.length == 0){
-                    reject(new ResourceNotFoundError());
-                    return;
-                }
-
-                resolve(groomers);
-
-            });
-        });
-
-    }
+}
 
     getById(id: number): Promise<Groomer> {
     
         return new Promise<Groomer>((resolve, reject) => {
     
-            if (!Validator.isValidId(id)) {
-                reject(new BadRequestError());
-                return;
-            }
     
             setTimeout(function() {
     
                 const groomer: Groomer = {...data.filter(groomer => groomer.id === id).pop()};
-                
-                if (!groomer) {
-                    reject(new ResourceNotFoundError());
-                    return;
-                }
                 resolve(groomer);
     
             }, 5000);
@@ -129,5 +120,19 @@ export class GroomerRepo implements CrudRepo<Groomer> {
 
             reject(new NotImplementedError());
         });
+    }
+
+    getGroomerByUniqueKey(key: string, val: string): Promise<Groomer> {
+
+        return new Promise<Groomer>((resolve, reject) => {
+           
+            setTimeout(() => {
+                const user = {...data.find(user => user[key] === val)};
+                resolve(user);
+            }, 250);
+
+        });
+        
+    
     }
 }
