@@ -14,7 +14,6 @@ export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
         resultSet.firstName,
         resultSet.lastName,
         resultSet.hoursWorked,
-        resultSet.earnings,
-        resultSet.role
-    )
+        resultSet.earnings
+    );
 }

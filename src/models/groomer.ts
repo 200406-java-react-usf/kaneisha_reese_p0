@@ -7,9 +7,9 @@ export class Groomer{
      lastName: string;
      hoursWorked: number;
      earnings: number;
-     role: string;
 
-    constructor(id:number, un: string, pass:string, fn:string, ln:string, hours:number, earn: number, role:string){
+
+    constructor(id:number, un: string, pass:string, fn:string, ln:string, hours:number, earn: number){
         this.id = id;
         this.username = un;
         this.password = pass;
@@ -17,6 +17,5 @@ export class Groomer{
         this.lastName = ln;
         this.hoursWorked = hours;
         this.earnings = earn;
-        this.role = role;
     }
 }

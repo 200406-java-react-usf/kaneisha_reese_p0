@@ -15,17 +15,17 @@ import { mapGroomerResultSet } from '../util/result-set-mapper';
 export class GroomerRepo implements CrudRepo<Groomer> {
     
     baseQuery = `
-    select
-        g.id, 
-        g.username, 
-        g.password, 
-        g.first_name,
-        g.last_name,
-        g.hours_worked,
-        g.earnings
-        
-    from groomers g
-`;
+        select
+            g.id, 
+            g.username, 
+            g.password, 
+            g.first_name,
+            g.last_name,
+            g.hours_worked,
+            g.earnings,
+            
+        from groomers g
+    `;
 
 async getAll(): Promise<Groomer[]> {
 
@@ -133,7 +133,7 @@ async getAll(): Promise<Groomer[]> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where g.username = $1 and au.password = $2`;
+            let sql = `${this.baseQuery} where g.username = $1 and g.password = $2`;
             let rs = await client.query(sql, [un, pw]);
             return mapGroomerResultSet(rs.rows[0]);
         } catch (e) {

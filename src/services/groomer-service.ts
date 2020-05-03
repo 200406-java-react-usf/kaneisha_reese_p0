@@ -23,173 +23,144 @@ export class GroomerService {
         this.groomerRepo = groomerRepo
     }
 
-    getAllGroomers(): Promise<Groomer[]> {
+    async getAllGroomers(): Promise<Groomer[]> {
         
         
-        return new Promise<Groomer[]>(async (resolve, reject) => {
+        let groomer = await this.groomerRepo.getAll();
 
-            let groomers: Groomer[] = [];
-            let result = await this.groomerRepo.getAll();
+        if (groomer.length ==0) {
+            throw new ResourceNotFoundError();
+        }
 
-            for(let groomer of result) {
-                groomers.push({...groomer});
-            }
-
-            if (groomers.length == 0){
-                reject(new ResourceNotFoundError());
-                return;
-            }
-
-            resolve(groomers);
-
-            
-        });
+        return groomer.map(this.removePassword);
 
     }
 
-    getGroomerById(id: number): Promise<Groomer> {
+    async getGroomerById(id: number): Promise<Groomer> {
     
-        return new Promise<Groomer>(async (resolve, reject) => {
+        if (!isValidId(id)){
+            throw new BadRequestError();
+        }
 
-            if (!isValidId(id)){
-                return reject(new BadRequestError());
+        let groomer = await this.groomerRepo.getById(id);
 
-            }
-            let groomer = {...await this.groomerRepo.getById(id)};
+        if (isEmptyObject(groomer)) {
+            throw new ResourceNotFoundError();
+        }
 
-            if(isEmptyObject(groomer)){
-                return reject(new ResourceNotFoundError());
-            }
-            resolve(groomer);
-        });
+        return this.removePassword(groomer);
+        
         
     }
 
-    getGroomerByUniqueKey(queryObj: any): Promise<Groomer> {
-        return new Promise<Groomer>(async (resolve, reject) => {
-
-            // we need to wrap this up in a try/catch in case errors are thrown for our awaits
-            try {
-
-                let queryKeys = Object.keys(queryObj);
-
-                if(!queryKeys.every(key => isPropertyOf(key, Groomer))) {
-                    return reject(new BadRequestError());
-                }
-
-                // we will only support single param searches (for now)
-                let key = queryKeys[0];
-                let val = queryObj[key];
-
-                // if they are searching for a user by id, reuse the logic we already have
-                if (key === 'id') {
-                    return resolve(await this.getGroomerById(+val));
-                }
-
-                // ensure that the provided key value is valid
-                if(!isValidStrings(val)) {
-                    return reject(new BadRequestError());
-                }
-
-                let groomer = {...await this.groomerRepo.getGroomerByUniqueKey(key, val)};
-
-                if (isEmptyObject(groomer)) {
-                    return reject(new ResourceNotFoundError());
-                }
-
-                resolve(groomer);
-
-            } catch (e) {
-                reject(e);
-            }
-
-        });  
-    
-    }
-
-    // addNewGroomer(newGroomer: Groomer): Promise<Groomer> {
-    //     return new Promise((resolve, reject) => {
-    //         if (!isValidObject(newGroomer, 'id')) {
-    //             reject(new BadRequestError('Invalid property values found in provided user.'));
-    //             return;
-    //         }
-
-    //         let conflict = this.getGroomerByUniqueKey({username: newGroomer.username})
-        
-    //             newGroomer.id = (data.length) + 1;
-    //             data.push(newGroomer);
-        
-    //             resolve(newGroomer);
-        
-            
-
-    //     });
-    
-    // }
-    // update(updatedGroomer: Groomer): Promise<boolean> {
-        
-    //     return new Promise<boolean>((resolve, reject) => {
-
-    //         if (!isValidObject(updatedGroomer)) {
-    //             reject(new BadRequestError('Invalid user provided (invalid values found).'));
-    //             return;
-    //         }
-        
-    //         setTimeout(() => {
-        
-    //             let persistedGroomer = data.find(user => user.id === updatedGroomer.id);
-        
-    //             if (!persistedGroomer) {
-    //                 reject(new ResourceNotFoundError('No user found with provided id.'));
-    //                 return;
-    //             }
-    
-    //             persistedGroomer = updatedGroomer;
-    
-    //             resolve(true);
-    //             return;
-        
-    //         });
-
-    //     });
-    
-    // }
-
-    deleteById(id: number): Promise<boolean> {
-
-        return new Promise<boolean>((resolve, reject) => {
-            
-            if (!isValidId(id)) {
-                reject(new BadRequestError());
-            }
-
-            reject(new NotImplementedError());
-        });
-    }
-
-    async authenticateGroomer(un: string, pw: string): Promise<Groomer> {
-
+    async getGroomerByUniqueKey(queryObj: any): Promise<Groomer> {
+       
         try {
 
-            if (!isValidStrings(un, pw)) {
+            let queryKeys = Object.keys(queryObj);
+
+            if(!queryKeys.every(key => isPropertyOf(key, Groomer))) {
                 throw new BadRequestError();
             }
 
-            let authGroomer: Groomer;
-            
-            authGroomer = await this.groomerRepo.getGroomerByCredentials(un, pw);
-           
+            // we will only support single param searches (for now)
+            let key = queryKeys[0];
+            let val = queryObj[key];
 
-            if (isEmptyObject(authGroomer)) {
-                throw new AuthenticationError('Bad credentials provided.');
+            // if they are searching for a user by id, reuse the logic we already have
+            if (key === 'id') {
+                return await this.getGroomerById(+val);
             }
 
-            return this.removePassword(authGroomer);
+            // ensure that the provided key value is valid
+            if(!isValidStrings(val)) {
+                throw new BadRequestError();
+            }
+
+            let groomer = {...await this.groomerRepo.getGroomerByUniqueKey(key, val)};
+
+            if (isEmptyObject(groomer)) {
+                throw new ResourceNotFoundError();
+            }
+
+            return this.removePassword(groomer);
 
         } catch (e) {
             throw e;
         }
+  
+    
     }
+
+    
+
+    async addNewGroomer(newGroomer: Groomer): Promise<Groomer> {
+        
+        try {
+
+            if (!isValidObject(newGroomer, 'id')) {
+                throw new BadRequestError('Invalid property values found in provided user.');
+            }
+
+            let usernameAvailable = await this.isUsernameAvailable(newGroomer.username);
+
+            if (!usernameAvailable) {
+                throw new ResourcePersistenceError('The provided username is already taken.');
+            }
+
+            const persistedGroomer = await this.groomerRepo.save(newGroomer);
+
+            return this.removePassword(persistedGroomer);
+
+        } catch (e) {
+            throw e
+        }
+
+    }
+
+    async updateUser(updatedGroomer: Groomer): Promise<boolean> {
+        
+        try {
+
+            if (!isValidObject(updatedGroomer)) {
+                throw new BadRequestError('Invalid user provided (invalid values found).');
+            }
+
+            // let repo handle some of the other checking since we are still mocking db
+            return await this.groomerRepo.update(updatedGroomer);
+        } catch (e) {
+            throw e;
+        }
+
+    }
+
+    async deleteById(id: number): Promise<boolean> {
+        
+        try {
+            throw new NotImplementedError();
+        } catch (e) {
+            throw e;
+        }
+
+    }
+
+    private async isUsernameAvailable(username: string): Promise<boolean> {
+
+        try {
+            await this.getGroomerByUniqueKey({'username': username});
+        } catch (e) {
+            console.log('username is available')
+            return true;
+        }
+
+        console.log('username is unavailable')
+        return false;
+
+    }
+
+   
+
+    
 
     private removePassword(groomer: Groomer): Groomer {
         if(!groomer || !groomer.password) return groomer;

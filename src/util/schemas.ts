@@ -5,7 +5,6 @@ export interface GroomerSchema {
     firstName: string;
     lastName: string;
     hoursWorked: number;
-    earnings: number;
-    role: string
+    earnings: number
 
 }
