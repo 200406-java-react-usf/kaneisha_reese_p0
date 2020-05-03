@@ -1,4 +1,4 @@
-import { Animal } from '../models/animals'
+import { Animal } from '../models/animal'
 
 let id = 1;
 
