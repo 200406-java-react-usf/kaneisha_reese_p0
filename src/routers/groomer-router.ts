@@ -39,10 +39,23 @@ GroomerRouter.get('/:id', async (req, resp) => {
 
 GroomerRouter.post('', async (req, resp) => {
 
-    console.log('POST REQUEST RECEIVED AT /users');
+    console.log('POST REQUEST RECEIVED AT /groomers');
     console.log(req.body);
     try {
         let newGroomer = await groomerService.addNewGroomer(req.body);
+        return resp.status(201).json(newGroomer);
+    } catch (e) {
+        return resp.status(e.statusCode).json(e);
+    }
+
+});
+
+GroomerRouter.post('/:id', async (req, resp) => {
+
+    console.log('POST REQUEST RECEIVED AT /groomers');
+    console.log(req.body);
+    try {
+        let newGroomer = await groomerService.updateGroomer(req.body);
         return resp.status(201).json(newGroomer);
     } catch (e) {
         return resp.status(e.statusCode).json(e);

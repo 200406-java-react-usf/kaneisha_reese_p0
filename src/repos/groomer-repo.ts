@@ -16,13 +16,13 @@ export class GroomerRepo implements CrudRepo<Groomer> {
     
     baseQuery = `
         select
-            g.id, 
+            g.groomer_id, 
             g.username, 
             g.password, 
             g.first_name,
             g.last_name,
-            g.hours_worked,
             g.earnings,
+            g.hours
             
         from groomers g
     `;
@@ -33,11 +33,11 @@ async getAll(): Promise<Groomer[]> {
 
     try {
         client = await connectionPool.connect();
-        let sql = `${this.baseQuery}`;
+        let sql = `${this.baseQuery};`;
         let rs = await client.query(sql); // rs = ResultSet
         return rs.rows.map(mapGroomerResultSet);
     } catch (e) {
-        throw new InternalServerError();
+        throw new InternalServerError('fail1');
     } finally {
         client && client.release();
     }
@@ -50,11 +50,11 @@ async getAll(): Promise<Groomer[]> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where g.id = $1`;
+            let sql = `${this.baseQuery} where g.groomer_id = $1`;
             let rs = await client.query(sql, [id]); // rs = ResultSet
             return mapGroomerResultSet(rs.rows[0]);
         } catch (e) {
-            throw new InternalServerError();
+            throw new InternalServerError('fail2');
         } finally {
             client && client.release();
         }
@@ -72,12 +72,12 @@ async getAll(): Promise<Groomer[]> {
             password, 
             first_name,
             last_name)
-            values ($1, $2, $3, $4)`;
+            values ($1, $2, $3, $4) returning groomer_id`;
             let rs = await client.query(sql,[newGroomer.username,newGroomer.password,newGroomer.firstName, newGroomer.lastName]); // rs = ResultSet
             newGroomer.id = rs.rows[0].id;
             return newGroomer;
         } catch (e) {
-            throw new InternalServerError();
+            throw new InternalServerError('fail3');
         } finally {
             client && client.release();
         }
@@ -89,11 +89,11 @@ async getAll(): Promise<Groomer[]> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where g.id = $1`;
+            let sql = `${this.baseQuery} where g.groomer_id = $1`;
             let rs = await client.query(sql); // rs = ResultSet
             return true;
         } catch (e) {
-            throw new InternalServerError();
+            throw new InternalServerError('fail4');
         } finally {
             client && client.release();
         }
@@ -121,7 +121,7 @@ async getAll(): Promise<Groomer[]> {
             let rs = await client.query(sql, [val]); // rs = ResultSet
             return mapGroomerResultSet(rs.rows[0]);
         } catch (e) {
-            throw new InternalServerError();
+            throw new InternalServerError('fail5');
         } finally {
             client && client.release();
         }
@@ -137,7 +137,7 @@ async getAll(): Promise<Groomer[]> {
             let rs = await client.query(sql, [un, pw]);
             return mapGroomerResultSet(rs.rows[0]);
         } catch (e) {
-            throw new InternalServerError();
+            throw new InternalServerError('fail6');
         } finally {
             client && client.release();
         }

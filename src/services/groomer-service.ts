@@ -118,7 +118,7 @@ export class GroomerService {
 
     }
 
-    async updateUser(updatedGroomer: Groomer): Promise<boolean> {
+    async updateGroomer(updatedGroomer: Groomer): Promise<boolean> {
         
         try {
 
