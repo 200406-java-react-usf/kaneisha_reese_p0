@@ -10,21 +10,21 @@ import {
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
+import { mapGroomerResultSet } from '../util/result-set-mapper';
 
 export class GroomerRepo implements CrudRepo<Groomer> {
     
     baseQuery = `
     select
-        au.id, 
-        au.username, 
-        au.password, 
-        au.first_name,
-        au.last_name,
-        au.email,
-        ur.name as role_name
-    from app_users au
-    join user_roles ur
-    on au.role_id = ur.id
+        g.id, 
+        g.username, 
+        g.password, 
+        g.first_name,
+        g.last_name,
+        g.hours_worked,
+        g.earnings
+        
+    from groomers g
 `;
 
 async getAll(): Promise<Groomer[]> {
@@ -35,7 +35,7 @@ async getAll(): Promise<Groomer[]> {
         client = await connectionPool.connect();
         let sql = `${this.baseQuery}`;
         let rs = await client.query(sql); // rs = ResultSet
-        return rs.rows.map(mapUserResultSet);
+        return rs.rows.map(mapGroomerResultSet);
     } catch (e) {
         throw new InternalServerError();
     } finally {
@@ -44,69 +44,59 @@ async getAll(): Promise<Groomer[]> {
 
 }
 
-    getById(id: number): Promise<Groomer> {
+    async getById(id: number): Promise<Groomer> {
     
-        return new Promise<Groomer>((resolve, reject) => {
-    
-    
-            setTimeout(function() {
-    
-                const groomer: Groomer = {...data.filter(groomer => groomer.id === id).pop()};
-                resolve(groomer);
-    
-            }, 5000);
-    
-        });
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where g.id = $1`;
+            let rs = await client.query(sql, [id]); // rs = ResultSet
+            return mapGroomerResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
         
     }
 
-    save(newGroomer: Groomer): Promise<Groomer> {
-        return new Promise((resolve, reject) => {
-            if (!Validator.isValidObject(newGroomer, 'id')) {
-                reject(new BadRequestError('Invalid property values found in provided user.'));
-                return;
-            }
+    async save(newGroomer: Groomer): Promise<Groomer> {
         
-            setTimeout(() => {
+        let client: PoolClient;
         
-                
-        
-                newGroomer.id = (data.length) + 1;
-                data.push(newGroomer);
-        
-                resolve(newGroomer);
-        
-            });
-
-        });
+        try {
+            client = await connectionPool.connect();
+            let sql = ` insert into groomers ( 
+            username, 
+            password, 
+            first_name,
+            last_name)
+            values ($1, $2, $3, $4)`;
+            let rs = await client.query(sql,[newGroomer.username,newGroomer.password,newGroomer.firstName, newGroomer.lastName]); // rs = ResultSet
+            newGroomer.id = rs.rows[0].id;
+            return newGroomer;
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
     
     }
-    update(updatedGroomer: Groomer): Promise<boolean> {
+    async update(updatedGroomer: Groomer): Promise<boolean> {
         
-        return new Promise<boolean>((resolve, reject) => {
+        let client: PoolClient;
 
-            if (!Validator.isValidObject(updatedGroomer)) {
-                reject(new BadRequestError('Invalid user provided (invalid values found).'));
-                return;
-            }
-        
-            setTimeout(() => {
-        
-                let persistedGroomer = data.find(user => user.id === updatedGroomer.id);
-        
-                if (!persistedGroomer) {
-                    reject(new ResourceNotFoundError('No user found with provided id.'));
-                    return;
-                }
-    
-                persistedGroomer = updatedGroomer;
-    
-                resolve(true);
-                return;
-        
-            });
-
-        });
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where g.id = $1`;
+            let rs = await client.query(sql); // rs = ResultSet
+            return true;
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
     
     }
 
@@ -122,17 +112,18 @@ async getAll(): Promise<Groomer[]> {
         });
     }
 
-    getGroomerByUniqueKey(key: string, val: string): Promise<Groomer> {
+    async getGroomerByUniqueKey(key: string, val: string): Promise<Groomer> {
+        let client: PoolClient;
 
-        return new Promise<Groomer>((resolve, reject) => {
-           
-            setTimeout(() => {
-                const user = {...data.find(user => user[key] === val)};
-                resolve(user);
-            }, 250);
-
-        });
-        
-    
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where ${key} = $1`;
+            let rs = await client.query(sql, [val]); // rs = ResultSet
+            return mapGroomerResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
     }
 }
