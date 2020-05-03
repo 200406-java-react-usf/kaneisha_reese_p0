@@ -4,8 +4,8 @@ import fs from 'fs';
 import morgan from 'morgan';
 import path from 'path';
 
-
-//import { AuthRouter } from './';
+import { GroomerRouter } from './routers/groomer-router';
+import { AuthRouter } from './routers/auth-router';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
@@ -33,9 +33,9 @@ app.use(morgan('combined', { stream: logStream }));
 app.use(sessionMiddleware);
 app.use(corsFilter);
 app.use('/', express.json());
-// app.use('/users', UserRouter);
+ app.use('/groomers', GroomerRouter);
 // app.use('/posts', PostRouter);
-// app.use('/auth', AuthRouter);
+ app.use('/auth', AuthRouter);
 
 app.listen(8080, () => {
     console.log(`Application running and listening at: http://localhost:8080`);
