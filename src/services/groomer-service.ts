@@ -1,4 +1,4 @@
-import data from "../data/groomers-db";
+
 import { Groomer } from "../models/groomer";
 import { GroomerRepo } from "../repos/groomer-repo";
 import { 
@@ -107,53 +107,53 @@ export class GroomerService {
     
     }
 
-    addNewGroomer(newGroomer: Groomer): Promise<Groomer> {
-        return new Promise((resolve, reject) => {
-            if (!isValidObject(newGroomer, 'id')) {
-                reject(new BadRequestError('Invalid property values found in provided user.'));
-                return;
-            }
+    // addNewGroomer(newGroomer: Groomer): Promise<Groomer> {
+    //     return new Promise((resolve, reject) => {
+    //         if (!isValidObject(newGroomer, 'id')) {
+    //             reject(new BadRequestError('Invalid property values found in provided user.'));
+    //             return;
+    //         }
 
-            let conflict = this.getGroomerByUniqueKey({username: newGroomer.username})
+    //         let conflict = this.getGroomerByUniqueKey({username: newGroomer.username})
         
-                newGroomer.id = (data.length) + 1;
-                data.push(newGroomer);
+    //             newGroomer.id = (data.length) + 1;
+    //             data.push(newGroomer);
         
-                resolve(newGroomer);
+    //             resolve(newGroomer);
         
             
 
-        });
+    //     });
     
-    }
-    update(updatedGroomer: Groomer): Promise<boolean> {
+    // }
+    // update(updatedGroomer: Groomer): Promise<boolean> {
         
-        return new Promise<boolean>((resolve, reject) => {
+    //     return new Promise<boolean>((resolve, reject) => {
 
-            if (!isValidObject(updatedGroomer)) {
-                reject(new BadRequestError('Invalid user provided (invalid values found).'));
-                return;
-            }
+    //         if (!isValidObject(updatedGroomer)) {
+    //             reject(new BadRequestError('Invalid user provided (invalid values found).'));
+    //             return;
+    //         }
         
-            setTimeout(() => {
+    //         setTimeout(() => {
         
-                let persistedGroomer = data.find(user => user.id === updatedGroomer.id);
+    //             let persistedGroomer = data.find(user => user.id === updatedGroomer.id);
         
-                if (!persistedGroomer) {
-                    reject(new ResourceNotFoundError('No user found with provided id.'));
-                    return;
-                }
+    //             if (!persistedGroomer) {
+    //                 reject(new ResourceNotFoundError('No user found with provided id.'));
+    //                 return;
+    //             }
     
-                persistedGroomer = updatedGroomer;
+    //             persistedGroomer = updatedGroomer;
     
-                resolve(true);
-                return;
+    //             resolve(true);
+    //             return;
         
-            });
+    //         });
 
-        });
+    //     });
     
-    }
+    // }
 
     deleteById(id: number): Promise<boolean> {
 
