@@ -17,7 +17,7 @@ AuthRouter.post('', async (req, resp) => {
 
         const { username, password } = req.body;
         let authGroomer = await groomerService.authenticateGroomer(username, password);
-        let payload = new Principal(authGroomer.id, authGroomer.username, authUser.role);
+        let payload = new Principal(authGroomer.id, authGroomer.username, authGroomer.role);
         req.session.principal = payload;
         resp.status(200).json(payload);
         

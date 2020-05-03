@@ -9,9 +9,12 @@ export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
 
     return new Groomer(
         resultSet.id,
+        resultSet.username,
+        resultSet.password,
         resultSet.firstName,
         resultSet.lastName,
         resultSet.hoursWorked,
-        resultSet.earnings
+        resultSet.earnings,
+        resultSet.role
     )
 }

@@ -1,10 +1,11 @@
 export interface GroomerSchema {
     id: number;
+    username: string,
+    password: string,
     firstName: string;
     lastName: string;
-    username: string;
-    password: string;
     hoursWorked: number;
     earnings: number;
+    role: string
 
 }
