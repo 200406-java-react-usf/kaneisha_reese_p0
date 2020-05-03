@@ -166,4 +166,35 @@ export class GroomerService {
             reject(new NotImplementedError());
         });
     }
+
+    async authenticateGroomer(un: string, pw: string): Promise<Groomer> {
+
+        try {
+
+            if (!isValidStrings(un, pw)) {
+                throw new BadRequestError();
+            }
+
+            let authGroomer: Groomer;
+            
+            authGroomer = await this.groomerRepo.getGroomerByCredentials(un, pw);
+           
+
+            if (isEmptyObject(authGroomer)) {
+                throw new AuthenticationError('Bad credentials provided.');
+            }
+
+            return this.removePassword(authGroomer);
+
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    private removePassword(groomer: Groomer): Groomer {
+        if(!groomer || !groomer.password) return groomer;
+        let gmr = {...groomer};
+        delete gmr.password;
+        return gmr;   
+    }
 }

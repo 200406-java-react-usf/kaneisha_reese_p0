@@ -126,4 +126,21 @@ async getAll(): Promise<Groomer[]> {
             client && client.release();
         }
     }
+
+    async getGroomerByCredentials(un: string, pw: string) {
+        
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where g.username = $1 and au.password = $2`;
+            let rs = await client.query(sql, [un, pw]);
+            return mapGroomerResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    
+    }
 }
