@@ -8,12 +8,12 @@ export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
     }
 
     return new Groomer(
-        resultSet.id,
+        resultSet.groomer_id,
         resultSet.username,
         resultSet.password,
-        resultSet.firstName,
-        resultSet.lastName,
-        resultSet.hoursWorked,
-        resultSet.earnings
+        resultSet.first_name,
+        resultSet.last_name,
+        resultSet.earnings,
+        resultSet.hours
     );
 }

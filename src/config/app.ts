@@ -5,6 +5,5 @@ const groomerRepo = new GroomerRepo();
 const groomerService = new GroomerService(groomerRepo);
 
 export default {
-
     groomerService
-}
+}   
