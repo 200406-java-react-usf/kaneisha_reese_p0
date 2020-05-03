@@ -1,4 +1,4 @@
-import { Service } from '../models/services'
+import { Service } from '../models/service'
 
 export default [
     new Service('bath', [0.5,0.5,1], [20, 25, 35]),
