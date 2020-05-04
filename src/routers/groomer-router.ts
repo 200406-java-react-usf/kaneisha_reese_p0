@@ -51,12 +51,15 @@ GroomerRouter.post('', async (req, resp) => {
 });
 
 GroomerRouter.post('/:id', async (req, resp) => {
-
+    const id = +req.params.id;
     console.log('POST REQUEST RECEIVED AT /groomers');
     console.log(req.body);
     try {
-        let newGroomer = await groomerService.updateGroomer(req.body);
-        return resp.status(201).json(newGroomer);
+        let updatedGroomer = await groomerService.updateGroomer(req.body);
+        updatedGroomer.id = id;
+
+        
+        return resp.status(201).json(updatedGroomer);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }

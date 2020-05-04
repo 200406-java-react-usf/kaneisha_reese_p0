@@ -83,15 +83,16 @@ async getAll(): Promise<Groomer[]> {
         }
     
     }
-    async update(updatedGroomer: Groomer): Promise<boolean> {
+    async update(updatedGroomer: Groomer): Promise<Groomer> {
         
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where g.groomer_id = $1`;
-            let rs = await client.query(sql); // rs = ResultSet
-            return true;
+            let sql = `update groomers set password = $1, first_name = $2, last_name = $3 where g.groomer_id = $4`;
+            let rs = await client.query(sql,[updatedGroomer.password, updatedGroomer.firstName, updatedGroomer.lastName, updatedGroomer.id]); // rs = ResultSet
+            updatedGroomer = mapGroomerResultSet(rs.rows[0]);
+            return updatedGroomer;
         } catch (e) {
             throw new InternalServerError('fail4');
         } finally {

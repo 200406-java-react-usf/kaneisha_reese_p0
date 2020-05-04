@@ -118,16 +118,25 @@ export class GroomerService {
 
     }
 
-    async updateGroomer(updatedGroomer: Groomer): Promise<boolean> {
+    async updateGroomer(updatedGroomer: Groomer): Promise<Groomer> {
         
         try {
 
             if (!isValidObject(updatedGroomer)) {
                 throw new BadRequestError('Invalid user provided (invalid values found).');
             }
+            let currentGroomer = await this.groomerRepo.getById(updatedGroomer.id);
+
+            if (currentGroomer.username != updatedGroomer.username){
+                throw new BadRequestError('fail10');
+            }
+            const persistedGroomer = await this.groomerRepo.update(updatedGroomer);
+            
 
             // let repo handle some of the other checking since we are still mocking db
-            return await this.groomerRepo.update(updatedGroomer);
+            return this.removePassword(persistedGroomer);
+            
+
         } catch (e) {
             throw e;
         }
