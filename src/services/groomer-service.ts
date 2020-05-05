@@ -122,7 +122,11 @@ export class GroomerService {
         
         try {
 
+            console.log('made it here - 1')
+
             if (!isValidObject(updatedGroomer)) {
+                console.log(updatedGroomer);
+                console.log(isValidObject(updatedGroomer))
                 throw new BadRequestError('Invalid user provided (invalid values found).');
     
             }
