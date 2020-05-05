@@ -30,6 +30,8 @@ export function mapServiceResultSet(resultSet: ServiceSchema): Service {
     return new Service(
         resultSet.id,
         resultSet.name,
+        resultSet.costs,
+        resultSet.hours
        
     );
 }

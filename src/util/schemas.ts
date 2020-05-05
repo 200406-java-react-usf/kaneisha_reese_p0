@@ -12,5 +12,8 @@ export interface GroomerSchema {
 export interface ServiceSchema {
     id: number;
     name: string;
+    costs: number[];
+    hours: number[];
+
 
 }
