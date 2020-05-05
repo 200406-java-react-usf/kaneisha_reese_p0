@@ -50,7 +50,7 @@ export class ServiceService {
     }
   
 
-    async addNewservice(newService: Service): Promise<Service> {
+    async addNewService(newService: Service): Promise<Service> {
         
         try {
 
@@ -70,7 +70,7 @@ export class ServiceService {
 
     }
 
-    async updateservice(updatedService: Service): Promise<Boolean> {
+    async updateService(updatedService: Service): Promise<Boolean> {
         
         try {
 

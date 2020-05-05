@@ -13,15 +13,9 @@ const serviceService = AppConfig.serviceService;
 ServiceRouter.get('', async (req,resp)=>{
 
     try {
-        let reqURL = url.parse(req.url, true);
-
-        if (!isEmptyObject<ParsedUrlQuery>(reqURL.query)) {
-            let payload = await serviceService.getServiceByUniqueKey({...reqURL.query});
-            resp.status(200).json(payload);
-        } else {
-            let payload = await serviceService.getAllServices();
-            resp.status(200).json(payload);
-        }
+        let payload = await serviceService.getAllServices();
+        resp.status(200).json(payload);
+        
     } catch (e) {
         resp.status(e.statusCode).json(e);
     }
