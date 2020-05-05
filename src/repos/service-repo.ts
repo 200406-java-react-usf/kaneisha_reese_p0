@@ -1,11 +1,6 @@
 import { Service } from '../models/Service'
 import { CrudRepo } from './crud-repo'
-import Validator from '../util/validator';
 import { 
-    BadRequestError, 
-    ResourceNotFoundError, 
-    ResourcePersistenceError,
-    NotImplementedError,
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
@@ -18,7 +13,6 @@ export class ServiceRepo implements CrudRepo<Service> {
         select
             s.id,
             s.name 
-            
             
         from Services s
     `;
@@ -33,7 +27,7 @@ async getAll(): Promise<Service[]> {
         let rs = await client.query(sql); // rs = ResultSet
         return rs.rows.map(mapServiceResultSet);
     } catch (e) {
-        throw new InternalServerError('fail1');
+        throw new InternalServerError();
     } finally {
         client && client.release();
     }
@@ -50,7 +44,7 @@ async getAll(): Promise<Service[]> {
             let rs = await client.query(sql, [id]); // rs = ResultSet
             return mapServiceResultSet(rs.rows[0]);
         } catch (e) {
-            throw new InternalServerError('fail2');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -60,7 +54,8 @@ async getAll(): Promise<Service[]> {
     async save(newService: Service): Promise<Service> {
         
         let client: PoolClient;
-        
+        let costs = newService.costs;
+        let hours = newService.hours;
         try {
             client = await connectionPool.connect();
             let sql = ` insert into Services ( 
@@ -68,9 +63,13 @@ async getAll(): Promise<Service[]> {
             values ($1) returning id`;
             let rs = await client.query(sql,[newService.name]); // rs = ResultSet
             newService.id = rs.rows[0].id;
+            let costing = (await client.query(`insert into service_pricing_by_size values( $1, 1, $2, $3),( $1, 2, $4, $5),( $1, 3, $6, $7), [newService.id, costs[0], hours[0], costs[1], hours[1], costs[2], hours[2]]`)).rows[0].id
+            if (!costing){
+                throw new InternalServerError();
+            }
             return newService;
         } catch (e) {
-            throw new InternalServerError('fail3');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -85,7 +84,7 @@ async getAll(): Promise<Service[]> {
             let rs = await client.query(sql,[updatedService.name, updatedService.id]); // rs = ResultSet
             return true;
         } catch (e) {
-            throw new InternalServerError(e);
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -103,7 +102,7 @@ async getAll(): Promise<Service[]> {
             await client.query(sql, [id]); 
             return true;
         } catch (e) {
-            throw new InternalServerError('try333');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
