@@ -8,3 +8,9 @@ export interface GroomerSchema {
     hours: number
 
 }
+
+export interface ServiceSchema {
+    id: number;
+    name: string;
+
+}

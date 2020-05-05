@@ -1,14 +1,12 @@
 export class Service{
 
-
+    id: number;
     name: string;
-    time: number[];
-    cost: number[];
 
-   constructor(name:string, hours:number[], earn:number[]){
-       
+
+   constructor(id: number, name:string){
+       this.id = id;
        this.name = name;
-       this.time = hours;
-       this.cost = earn;
+
    }
 }

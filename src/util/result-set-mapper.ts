@@ -1,5 +1,9 @@
-import { GroomerSchema } from './schemas';
+import {
+     GroomerSchema, 
+    ServiceSchema
+    } from './schemas';
 import { Groomer } from '../models/groomer';
+import { Service } from '../models/service';
 
 export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
     
@@ -15,5 +19,17 @@ export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
         resultSet.last_name,
         resultSet.earnings,
         resultSet.hours
+    );
+}
+export function mapServiceResultSet(resultSet: ServiceSchema): Service {
+    
+    if (!resultSet){
+        return {} as Service;
+    }
+
+    return new Service(
+        resultSet.id,
+        resultSet.name,
+       
     );
 }
