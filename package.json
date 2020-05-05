@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "tsc && node ./build/index.js",
-    "test": "jest --watch --no-cache",
-    "coverage": "jest --coverage"
+    "test": "jest --watch --no-cache --coverage",
+    "coverage": "jest --coverage --no-cache"
   },
   "author": "Kaneisha Reese",
   "license": "ISC",
