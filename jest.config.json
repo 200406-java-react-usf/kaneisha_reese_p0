@@ -3,7 +3,7 @@
         "<rootDir>/src"
     ],
     "testMatch": [
-        "**/__tests__/**/*.+(ts|js|tsx|jsx)"
+        "**/__test__/**/*.+(ts|js|tsx|jsx)"
     ],
     "transform": {
         "^.+\\.(ts|tsx)$": "ts-jest"
