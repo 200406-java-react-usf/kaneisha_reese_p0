@@ -2,7 +2,7 @@ import { GroomerService } from '../services/groomer-service';
 import { GroomerRepo } from '../repos/groomer-repo';
 import { Groomer } from '../models/groomer';
 import Validator from '../util/validator';
-import { ResourceNotFoundError, BadRequestError } from '../errors/errors';
+import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError } from '../errors/errors';
 import e from 'express';
 
 jest.mock('../repos/groomer-repo', () => {
@@ -307,26 +307,96 @@ describe('groomerService', () => {
 
     });
 
-    test('should resolve to Groomer when addNewGroomer is given valid groomer', async () => {
+    // test('should resolve to Groomer when addNewGroomer is given valid groomer', async () => {
+
+    //     // Arrange
+
+    //     let mockGroomer = new Groomer(10, 'test', 'test', 'test', 'test', 0, 0);
+    //     Validator.isValidObject = jest.fn().mockReturnValue(true);
+        
+    //     mockRepo.getGroomerByUniqueKey = jest.fn().mockImplementation(async () => {
+    //        await( new BadRequestError());
+    //       });
+
+    //     mockRepo.save = jest.fn().mockReturnValue(mockGroomer);
+        
+
+
+    //     // Act
+    //     let result = await sut.addNewGroomer(mockGroomer);
+
+    //     // Assert
+    //     expect(result).toBeTruthy();
+    //     expect(result.id).toBe(1);
+    //     expect(result.password).toBeUndefined();
+
+    // });
+
+    test('should throw BadRequestError when addNewGroomer is given invalid groomer object', async () => {
 
         // Arrange
-        
+            
         let mockGroomer = new Groomer(10, 'test', 'test', 'test', 'test', 0, 0);
-        Validator.isValidObject = jest.fn().mockReturnValue(true);
+        Validator.isValidObject = jest.fn().mockReturnValue(false);
         
-        mockRepo.getGroomerByUniqueKey = jest.fn().mockReturnValue(new BadRequestError())
+
         mockRepo.save = jest.fn().mockReturnValue(mockGroomer);
         
 
 
         // Act
-        let result = await sut.addNewGroomer(mockGroomer);
+        try {
+            await sut.addNewGroomer(null);
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof BadRequestError).toBe(true);
+        }
+
+    });
+
+    test('should throw ResourcePersistenceError when addNewGroomer is given username already in use', async () => {
+
+        // Arrange
+            
+        let mockGroomer = new Groomer(10, 'test', 'test', 'test', 'test', 0, 0);
+        Validator.isValidObject = jest.fn().mockReturnValue(true);
+        mockRepo.getGroomerByUniqueKey = jest.fn().mockReturnValue(mockGroomer);
+        
+
+
+        // Act
+        try {
+            await sut.getGroomerByUniqueKey({'username':'aanderson1'});
+        } catch (e) {
+
+            // Assert
+            expect(e instanceof ResourcePersistenceError).toBe(true);
+        }
+
+    });
+
+    test('should resolve to true when updateGroomer is given a valid groomer object', async () => {
+
+        // Arrange
+        expect.hasAssertions();
+        let mockGroomer = new Groomer(1, 'aanderson', 'password', 'Alice', 'Anderson', 0, 0);
+        
+        Validator.isValidObject = jest.fn().mockReturnValue(true);
+        Validator.isPropertyOf = jest.fn().mockReturnValue(true);
+        
+        mockRepo.update = jest.fn().mockImplementation(()=>{
+            return true;
+        });
+
+        // Act
+        let result = await sut.updateGroomer(mockGroomer);
 
         // Assert
         expect(result).toBeTruthy();
-        expect(result.id).toBe(1);
-        expect(result.password).toBeUndefined();
+        expect(result).toBe(true);
 
     });
+
 
 });
