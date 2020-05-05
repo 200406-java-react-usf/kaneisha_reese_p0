@@ -83,34 +83,37 @@ async getAll(): Promise<Groomer[]> {
         }
     
     }
-    async update(updatedGroomer: Groomer): Promise<Groomer> {
-        
+    async update(updatedGroomer: Groomer): Promise<Boolean> {
         let client: PoolClient;
 
         try {
             client = await connectionPool.connect();
-            let sql = `update groomers set password = $1, first_name = $2, last_name = $3 where g.groomer_id = $4`;
-            let rs = await client.query(sql,[updatedGroomer.password, updatedGroomer.firstName, updatedGroomer.lastName, updatedGroomer.id]); // rs = ResultSet
-            updatedGroomer = mapGroomerResultSet(rs.rows[0]);
-            return updatedGroomer;
+            let sql = 'update groomers set password = $1, first_name = $2, last_name = $3 where username = $4;';
+            let rs = await client.query(sql,[updatedGroomer.password, updatedGroomer.firstName, updatedGroomer.lastName, updatedGroomer.username]); // rs = ResultSet
+            return true;
         } catch (e) {
-            throw new InternalServerError('fail4');
+            throw new InternalServerError(e);
         } finally {
             client && client.release();
         }
     
     }
 
-    deleteById(id: number): Promise<boolean> {
+    async deleteById(id: number): Promise<boolean> {
+        let client: PoolClient;
+		
 
-        return new Promise<boolean>((resolve, reject) => {
-            
-            if (!Validator.isValidId(id)) {
-                reject(new BadRequestError());
-            }
-
-            reject(new NotImplementedError());
-        });
+        try {
+            console.log(id);
+            client = await connectionPool.connect();
+            let sql = `delete from groomers where groomer_id = $1 on delete cascade;`;
+            await client.query(sql, [id]); 
+            return true;
+        } catch (e) {
+            throw new InternalServerError('try333');
+        } finally {
+            client && client.release();
+        }
     }
 
     async getGroomerByUniqueKey(key: string, val: string): Promise<Groomer> {
@@ -128,20 +131,4 @@ async getAll(): Promise<Groomer[]> {
         }
     }
 
-    async getGroomerByCredentials(un: string, pw: string) {
-        
-        let client: PoolClient;
-
-        try {
-            client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where g.username = $1 and g.password = $2`;
-            let rs = await client.query(sql, [un, pw]);
-            return mapGroomerResultSet(rs.rows[0]);
-        } catch (e) {
-            throw new InternalServerError('fail6');
-        } finally {
-            client && client.release();
-        }
-    
-    }
 }

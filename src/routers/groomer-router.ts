@@ -50,16 +50,24 @@ GroomerRouter.post('', async (req, resp) => {
 
 });
 
-GroomerRouter.post('/:id', async (req, resp) => {
-    const id = +req.params.id;
-    console.log('POST REQUEST RECEIVED AT /groomers');
+GroomerRouter.put('', async (req, resp) => {
+
+    console.log('PUT REQUEST RECEIVED AT /groomers');
     console.log(req.body);
     try {
         let updatedGroomer = await groomerService.updateGroomer(req.body);
-        updatedGroomer.id = id;
+        return resp.status(201).json(updatedGroomer).send();
+    } catch (e) {
+        return resp.status(e.statusCode).json(e).send();
+    }
 
-        
-        return resp.status(201).json(updatedGroomer);
+});
+
+GroomerRouter.delete('/:id', async (req,resp)=>{
+    const id = +req.params.id;
+    try {
+        let payload = await groomerService.deleteById(id);
+        return resp.status(200).json(payload);
     } catch (e) {
         return resp.status(e.statusCode).json(e);
     }

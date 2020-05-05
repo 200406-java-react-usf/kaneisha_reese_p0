@@ -118,23 +118,22 @@ export class GroomerService {
 
     }
 
-    async updateGroomer(updatedGroomer: Groomer): Promise<Groomer> {
+    async updateGroomer(updatedGroomer: Groomer): Promise<Boolean> {
         
         try {
 
             if (!isValidObject(updatedGroomer)) {
                 throw new BadRequestError('Invalid user provided (invalid values found).');
+    
             }
-            let currentGroomer = await this.groomerRepo.getById(updatedGroomer.id);
-
-            if (currentGroomer.username != updatedGroomer.username){
-                throw new BadRequestError('fail10');
+    
+            let queryKeys = Object.keys(updatedGroomer);
+    
+            if (!queryKeys.every(key => isPropertyOf(key, Groomer))) {
+                throw new BadRequestError();
             }
-            const persistedGroomer = await this.groomerRepo.update(updatedGroomer);
-            
 
-            // let repo handle some of the other checking since we are still mocking db
-            return this.removePassword(persistedGroomer);
+            return await this.groomerRepo.update(updatedGroomer);
             
 
         } catch (e) {
@@ -144,16 +143,26 @@ export class GroomerService {
     }
 
     async deleteById(id: number): Promise<boolean> {
+        try{
+            
+    
+            if(!isValidId(id)){
+                throw new BadRequestError();
+            }
+            
+            await this.groomerRepo.deleteById(id);
+    
+            return true;
+    
         
-        try {
-            throw new NotImplementedError();
+       
         } catch (e) {
             throw e;
         }
 
     }
 
-    private async isUsernameAvailable(username: string): Promise<boolean> {
+     async isUsernameAvailable(username: string): Promise<boolean> {
 
         try {
             await this.getGroomerByUniqueKey({'username': username});
