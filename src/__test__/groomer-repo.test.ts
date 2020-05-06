@@ -156,7 +156,7 @@ describe('groomerRepo', () => {
         (mockMapper.mapGroomerResultSet as jest.Mock).mockReturnValue(mockGroomer);
         //Act
 
-        let result = await sut.deleteById(mockGroomer.id);
+        let result = await sut.deleteById(mockGroomer.groomer_id);
 
         //Assert
         expect(result).toBeTruthy();
