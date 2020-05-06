@@ -70,20 +70,21 @@ async getAll(): Promise<Animal[]> {
             size = 2;
         } else size =3;
         try {
-            console.log('made it here 1')
+            console.log('made it here 1');
             client = await connectionPool.connect();
             let groomerId = (await client.query(`select groomer_id from groomers g where g.hours = (select min(hours) from groomers) limit 1`)).rows[0].groomer_id;
             console.log(groomerId)
             console.log('made it here 2')
-            let sql = `insert into animals (name, groomer_id, weight) values ($1, $2, $);` /*insert into animal_size values (animal_id, $4); */;
+            let sql = `insert into animals (name, groomer_id, weight) values ($1, $2, $3) returning animal_id;` /*insert into animal_size values (animal_id, $4); */;
             let rs = await client.query(sql,[name, groomerId, weight]); // rs = ResultSet
-            console.log('made it here 3')
+            console.log(rs);
+            console.log('made it here 3');
             newAnimal.animal_id = rs.rows[0].animal_id;
             
             //loop over service and add to junction table
-            for (let i=1; i<= services.length; i++){
-               await client.query(`insert into animal_services values($1, (select service_id from services s where s.name = $2))`, [newAnimal.animal_id, services[i-1]]);
-            }
+            // for (let i=1; i<= services.length; i++){
+            //    await client.query(`insert into animal_services values($1, (select service_id from services s where s.name = $2))`, [newAnimal.animal_id, services[i-1]]);
+            // }
             return newAnimal;
         } catch (e) {
             throw new InternalServerError();
