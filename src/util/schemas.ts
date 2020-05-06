@@ -15,3 +15,11 @@ export interface ServiceSchema {
     costs: number[];
     hours: number[];
 }
+
+export interface AnimalSchema {
+    animal_id: number;
+    name: string;
+    groomer_id: number; 
+    weight: number; 
+    services: string[];
+}

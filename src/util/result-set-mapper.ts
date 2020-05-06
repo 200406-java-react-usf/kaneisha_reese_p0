@@ -1,9 +1,11 @@
 import {
      GroomerSchema, 
-    ServiceSchema
+    ServiceSchema,
+    AnimalSchema
     } from './schemas';
 import { Groomer } from '../models/groomer';
 import { Service } from '../models/service';
+import { Animal } from '../models/animal';
 
 export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
     
@@ -21,6 +23,7 @@ export function mapGroomerResultSet(resultSet: GroomerSchema): Groomer {
         resultSet.hours
     );
 }
+
 export function mapServiceResultSet(resultSet: ServiceSchema): Service {
     
     if (!resultSet){
@@ -33,4 +36,18 @@ export function mapServiceResultSet(resultSet: ServiceSchema): Service {
         resultSet.costs = null,
         resultSet.hours = null,
     );
+}
+
+export function mapAnimalResultSet(resultSet: AnimalSchema): Animal{
+
+    if (!resultSet){
+        return {} as Animal;
+    }
+    return new Animal(
+        resultSet.animal_id,
+        resultSet.name,
+        resultSet.groomer_id,
+       resultSet.weight,
+       resultSet.services 
+    )
 }

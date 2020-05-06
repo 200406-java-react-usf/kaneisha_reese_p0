@@ -1,29 +1,18 @@
 export class Animal{
 
-    id: number;
+    animal_id: number;
     name: string;
-    groomerId: number; //foreign key to a different table
+    groomer_id: number; //foreign key to a different table
     weight: number; // in lbs
-    status: boolean;
-    size: number;
+    services: string[];
 
 
-   constructor(id:number, name:string, groomer:number, weight:number, status:boolean){
-       this.id = id;
+   constructor(id:number, name:string, groomer:number, weight:number, services:string[]){
+       this.animal_id = id;
        this.name = name;
-       this.groomerId = groomer;
+       this.groomer_id = groomer;
        this.weight = weight;
-       this.status = status;
-
-       if (weight < 15){
-           this.size = 1;
-       }
-        else if (weight < 30){
-           this.size = 2;
-       } 
-       else {
-           this.size = 3;
-        }
+       this.services = services;
 
    }
 }
