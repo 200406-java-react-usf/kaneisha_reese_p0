@@ -4,7 +4,7 @@
 Project 0 will build an API representing a Pet Grooming Salon. The Salon will have Animals, Groomers, and Services. The animals will be assigned an id, name, weight, groomerId, status (determines if the animal has been serviced), and size (which is determined by the animal's weight). The animal will also have a list of services associated with their id. Services have a name, id, cost and time. The cost and time associated with a service are dependent on the animal's size. Groomers have an id, first and last name, hours worked and earnings. Groomers will be assigned animals to service and their hours and earning will update to reflect this. 
 
 When an animal is added to the database, the groomerId assigned to the animal is chosen by selecting the groomer's id with the least hours. The groomers hours and earning are then updated based on the services assigned to the added animal.
-<img src="images/Project0ERD.jpg">
+<img src="images/ERD2.jpeg">
 
 
 ## Instructions
