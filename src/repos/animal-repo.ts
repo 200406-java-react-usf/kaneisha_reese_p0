@@ -6,7 +6,7 @@ import {
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
 import { mapAnimalResultSet } from '../util/result-set-mapper';
-import animalsDb from '../data/animals-db';
+
 
 export class AnimalRepo implements CrudRepo<Animal> {
     
@@ -61,19 +61,29 @@ async getAll(): Promise<Animal[]> {
         
         let client: PoolClient;
         let name = newAnimal.name;
+        let services = newAnimal.services;
+        let weight = newAnimal.weight;
         let size: number;
-        if (newAnimal.weight <=20 ){
+        if (weight <=20 ){
            size = 1; 
-        } else if (newAnimal.weight <=45 ){
+        } else if (weight <=45 ){
             size = 2;
         } else size =3;
         try {
-            
+            console.log('made it here 1')
             client = await connectionPool.connect();
-            let groomerId = (await client.query(`select groomer_id from groomers g where g.hours = (select min(hours) from groomers) limit 1`));
-            let sql = `insert into animals (name, groomer_id, weight) values ($1, ${groomerId}, $3) returning animal_id; insert into animal_size values (animal_id, ${size}); `;
-            let rs = await client.query(sql,[name]); // rs = ResultSet
+            let groomerId = (await client.query(`select groomer_id from groomers g where g.hours = (select min(hours) from groomers) limit 1`)).rows[0].groomer_id;
+            console.log(groomerId)
+            console.log('made it here 2')
+            let sql = `insert into animals (name, groomer_id, weight) values ($1, $2, $);` /*insert into animal_size values (animal_id, $4); */;
+            let rs = await client.query(sql,[name, groomerId, weight]); // rs = ResultSet
+            console.log('made it here 3')
             newAnimal.animal_id = rs.rows[0].animal_id;
+            
+            //loop over service and add to junction table
+            for (let i=1; i<= services.length; i++){
+               await client.query(`insert into animal_services values($1, (select service_id from services s where s.name = $2))`, [newAnimal.animal_id, services[i-1]]);
+            }
             return newAnimal;
         } catch (e) {
             throw new InternalServerError();
