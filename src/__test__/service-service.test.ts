@@ -66,7 +66,7 @@ describe('serviceService', () => {
 
     });
 
-    test('should reject with ResourceNotFoundError when getAllServices fails to get any users from the data source', async () => {
+    test('should reject with ResourceNotFoundError when getAllServices fails to get any services from the data source', async () => {
 
         // Arrange
         jest.clearAllMocks();
@@ -84,7 +84,7 @@ describe('serviceService', () => {
 
     });
 
-    test('should resolve to Service when getUserById is given a valid an known id', async () => {
+    test('should resolve to Service when getServiceById is given a valid an known id', async () => {
 
         // Arrange
         jest.clearAllMocks();
