@@ -6,10 +6,12 @@ import path from 'path';
 
 import { GroomerRouter } from './routers/groomer-router';
 import { ServiceRouter } from './routers/service-router';
+import { AnimalRouter } from './routers/animal-router';
 
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
+
 
 
 // environment configuration
@@ -37,6 +39,7 @@ app.use(corsFilter);
 app.use('/', express.json());
 app.use('/groomers', GroomerRouter);
 app.use('/services', ServiceRouter);
+app.use('/animals', AnimalRouter);
 
 
 
