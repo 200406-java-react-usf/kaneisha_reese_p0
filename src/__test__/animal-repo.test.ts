@@ -118,7 +118,7 @@ describe('animalRepo', () => {
 
     });
 
-    test('should resolve to a animal object when save adds a record to the data source', async ()=>{
+    test('should resolve to a animal object when save adds a record to the data source weight <=15', async ()=>{
 
         //Arrange
         jest.clearAllMocks();
@@ -134,13 +134,77 @@ describe('animalRepo', () => {
         expect(result).toBeTruthy();
         expect(result instanceof Animal).toBe(true);
     });
+    test('should resolve to a animal object when save adds a record to the data source 15 < weight <= 45', async ()=>{
 
-    test('should resolve to a boolean when update adds a record to the data source', async ()=>{
+        //Arrange
+        jest.clearAllMocks();
+        expect.hasAssertions();
+
+        let mockAnimal = new Animal(1, 'name3',1,30,[]);
+        (mockMapper.mapAnimalResultSet as jest.Mock).mockReturnValue(mockAnimal);
+        //Act
+
+        let result = await sut.save(mockAnimal);
+
+        //Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof Animal).toBe(true);
+    });
+    test('should resolve to a animal object when save adds a record to the data source weight > 45', async ()=>{
+
+        //Arrange
+        jest.clearAllMocks();
+        expect.hasAssertions();
+
+        let mockAnimal = new Animal(1, 'name2',1,72,[]);
+        (mockMapper.mapAnimalResultSet as jest.Mock).mockReturnValue(mockAnimal);
+        //Act
+
+        let result = await sut.save(mockAnimal);
+
+        //Assert
+        expect(result).toBeTruthy();
+        expect(result instanceof Animal).toBe(true);
+    });
+
+    test('should resolve to a boolean when update adds a record to the data source weight <= 15', async ()=>{
 
         //Arrange
         expect.hasAssertions();
 
         let mockAnimal = new Animal(1, 'name',1,12,[]);
+        (mockMapper.mapAnimalResultSet as jest.Mock).mockReturnValue(mockAnimal);
+        //Act
+
+        let result = await sut.update(mockAnimal);
+
+        //Assert
+        expect(result).toBeTruthy();
+        expect(result).toBe(true);
+    });
+
+    test('should resolve to a boolean when update adds a record to the data source 15 < weight <=45', async ()=>{
+
+        //Arrange
+        expect.hasAssertions();
+
+        let mockAnimal = new Animal(1, 'name',1,30,[]);
+        (mockMapper.mapAnimalResultSet as jest.Mock).mockReturnValue(mockAnimal);
+        //Act
+
+        let result = await sut.update(mockAnimal);
+
+        //Assert
+        expect(result).toBeTruthy();
+        expect(result).toBe(true);
+    });
+
+    test('should resolve to a boolean when update adds a record to the data source weight >45', async ()=>{
+
+        //Arrange
+        expect.hasAssertions();
+
+        let mockAnimal = new Animal(1, 'name',1,50,[]);
         (mockMapper.mapAnimalResultSet as jest.Mock).mockReturnValue(mockAnimal);
         //Act
 
