@@ -37,7 +37,7 @@ async getAll(): Promise<Groomer[]> {
         let rs = await client.query(sql); // rs = ResultSet
         return rs.rows.map(mapGroomerResultSet);
     } catch (e) {
-        throw new InternalServerError('fail1');
+        throw new InternalServerError();
     } finally {
         client && client.release();
     }
@@ -54,7 +54,7 @@ async getAll(): Promise<Groomer[]> {
             let rs = await client.query(sql, [id]); // rs = ResultSet
             return mapGroomerResultSet(rs.rows[0]);
         } catch (e) {
-            throw new InternalServerError('fail2');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -73,11 +73,11 @@ async getAll(): Promise<Groomer[]> {
             first_name,
             last_name)
             values ($1, $2, $3, $4) returning groomer_id`;
-            let rs = await client.query(sql,[newGroomer.username,newGroomer.password,newGroomer.firstName, newGroomer.lastName]); // rs = ResultSet
-            newGroomer.id = rs.rows[0].id;
+            let rs = await client.query(sql,[newGroomer.username,newGroomer.password,newGroomer.first_name, newGroomer.last_name]); // rs = ResultSet
+            newGroomer.groomer_id = rs.rows[0].id;
             return newGroomer;
         } catch (e) {
-            throw new InternalServerError('fail3');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -89,10 +89,10 @@ async getAll(): Promise<Groomer[]> {
         try {
             client = await connectionPool.connect();
             let sql = 'update groomers set password = $1, first_name = $2, last_name = $3 where username = $4;';
-            let rs = await client.query(sql,[updatedGroomer.password, updatedGroomer.firstName, updatedGroomer.lastName, updatedGroomer.username]); // rs = ResultSet
+            let rs = await client.query(sql,[updatedGroomer.password, updatedGroomer.first_name, updatedGroomer.last_name, updatedGroomer.username]); // rs = ResultSet
             return true;
         } catch (e) {
-            throw new InternalServerError(e);
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -104,13 +104,13 @@ async getAll(): Promise<Groomer[]> {
 		
 
         try {
-            console.log(id);
+            
             client = await connectionPool.connect();
-            let sql = `delete from groomers where groomer_id = $1 on delete cascade;`;
+            let sql = `delete from groomers where groomer_id = $1;`;
             await client.query(sql, [id]); 
             return true;
         } catch (e) {
-            throw new InternalServerError('try333');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }
@@ -125,7 +125,7 @@ async getAll(): Promise<Groomer[]> {
             let rs = await client.query(sql, [val]); // rs = ResultSet
             return mapGroomerResultSet(rs.rows[0]);
         } catch (e) {
-            throw new InternalServerError('fail5');
+            throw new InternalServerError();
         } finally {
             client && client.release();
         }

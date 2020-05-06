@@ -27,11 +27,10 @@ export function mapServiceResultSet(resultSet: ServiceSchema): Service {
         return {} as Service;
     }
 
-    return new Service(
-        resultSet.id,
+    return new Service(      
+        resultSet.service_id,
         resultSet.name,
-        resultSet.costs,
-        resultSet.hours
-       
+        resultSet.costs = null,
+        resultSet.hours = null,
     );
 }

@@ -11,7 +11,7 @@ export class ServiceRepo implements CrudRepo<Service> {
     
     baseQuery = `
         select
-            s.id,
+            s.service_id,
             s.name 
             
         from Services s
@@ -22,9 +22,12 @@ async getAll(): Promise<Service[]> {
     let client: PoolClient;
 
     try {
+       
         client = await connectionPool.connect();
+        
         let sql = `${this.baseQuery};`;
         let rs = await client.query(sql); // rs = ResultSet
+       
         return rs.rows.map(mapServiceResultSet);
     } catch (e) {
         throw new InternalServerError();
@@ -40,7 +43,7 @@ async getAll(): Promise<Service[]> {
 
         try {
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where s.id = $1`;
+            let sql = `${this.baseQuery} where s.service_id = $1`;
             let rs = await client.query(sql, [id]); // rs = ResultSet
             return mapServiceResultSet(rs.rows[0]);
         } catch (e) {
@@ -54,19 +57,14 @@ async getAll(): Promise<Service[]> {
     async save(newService: Service): Promise<Service> {
         
         let client: PoolClient;
-        let costs = newService.costs;
-        let hours = newService.hours;
+        let name = newService.name;
+        
         try {
+            
             client = await connectionPool.connect();
-            let sql = ` insert into Services ( 
-            name)
-            values ($1) returning id`;
-            let rs = await client.query(sql,[newService.name]); // rs = ResultSet
-            newService.id = rs.rows[0].id;
-            let costing = (await client.query(`insert into service_pricing_by_size values( $1, 1, $2, $3),( $1, 2, $4, $5),( $1, 3, $6, $7), [newService.id, costs[0], hours[0], costs[1], hours[1], costs[2], hours[2]]`)).rows[0].id
-            if (!costing){
-                throw new InternalServerError();
-            }
+            let sql = `insert into services (name) values ($1) returning service_id;`;
+            let rs = await client.query(sql,[name]); // rs = ResultSet
+            newService.service_id = rs.rows[0].service_id;
             return newService;
         } catch (e) {
             throw new InternalServerError();
@@ -80,8 +78,8 @@ async getAll(): Promise<Service[]> {
 
         try {
             client = await connectionPool.connect();
-            let sql = 'update Services set name = $1 where id = $2;';
-            let rs = await client.query(sql,[updatedService.name, updatedService.id]); // rs = ResultSet
+            let sql = 'update Services set name = $1 where service_id = $2;';
+            let rs = await client.query(sql,[updatedService.name, updatedService.service_id]); // rs = ResultSet
             return true;
         } catch (e) {
             throw new InternalServerError();
@@ -96,9 +94,9 @@ async getAll(): Promise<Service[]> {
 		
 
         try {
-            console.log(id);
+           
             client = await connectionPool.connect();
-            let sql = `delete from Services where id = $1 on delete cascade;`;
+            let sql = `delete from Services where service_id = $1;`;
             await client.query(sql, [id]); 
             return true;
         } catch (e) {

@@ -98,9 +98,6 @@ export class GroomerService {
         
         try {
 
-            if (!isValidObject(newGroomer, 'id')) {
-                throw new BadRequestError('Invalid property values found in provided user.');
-            }
 
             let usernameAvailable = await this.isUsernameAvailable(newGroomer.username);
 
@@ -122,10 +119,6 @@ export class GroomerService {
         
         try {
 
-            if (!isValidObject(updatedGroomer)) {
-                throw new BadRequestError('Invalid user provided (invalid values found).');
-    
-            }
     
             let queryKeys = Object.keys(updatedGroomer);
     

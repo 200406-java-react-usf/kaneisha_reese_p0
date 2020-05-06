@@ -10,10 +10,8 @@ export interface GroomerSchema {
 }
 
 export interface ServiceSchema {
-    id: number;
+    service_id: number;
     name: string;
     costs: number[];
     hours: number[];
-
-
 }

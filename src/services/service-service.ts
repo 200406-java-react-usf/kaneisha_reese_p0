@@ -28,7 +28,7 @@ export class ServiceService {
             throw new ResourceNotFoundError();
         }
 
-        return service;
+        return service.map(this.removeCostAndHours);
 
     }
 
@@ -44,7 +44,7 @@ export class ServiceService {
             throw new ResourceNotFoundError();
         }
 
-        return service;
+        return this.removeCostAndHours(service);
         
         
     }
@@ -53,16 +53,14 @@ export class ServiceService {
     async addNewService(newService: Service): Promise<Service> {
         
         try {
-
+            
             if (!isValidObject(newService, 'id')) {
                 throw new BadRequestError('Invalid property values found in provided service.');
             }
 
-            
-
             const persistedService = await this.serviceRepo.save(newService);
 
-            return persistedService;
+            return this.removeCostAndHours(persistedService);
 
         } catch (e) {
             throw e
@@ -82,7 +80,7 @@ export class ServiceService {
             let queryKeys = Object.keys(updatedService);
     
             if (!queryKeys.every(key => isPropertyOf(key, Service))) {
-                throw new BadRequestError();
+                throw new BadRequestError('teting5');
             }
 
             return await this.serviceRepo.update(updatedService);
@@ -112,5 +110,13 @@ export class ServiceService {
             throw e;
         }
 
+    }
+
+    private removeCostAndHours(service: Service): Service {
+        if(!service || (!service.costs && !service.hours)) return service;
+        let srv = {...service};
+        delete srv["costs"];
+        delete srv.hours;
+        return srv;   
     }
 }
